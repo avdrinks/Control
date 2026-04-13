@@ -3,53 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AV DRINKS APP</title>
+    <title>AV DRINKS - Gestión</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <div class="header">
         <h1>AV DRINKS</h1>
+        <div class="neon-line"></div>
     </div>
 
     <div id="home" class="view active">
         <div class="menu-grid">
-            <button class="btn-main" onclick="openView('v-venta')">💰 Cargar Venta</button>
-            <button class="btn-main" onclick="openView('v-stock')">📦 Stock Total</button>
-            <button class="btn-main" onclick="openView('v-compra')">🛒 Agregar Compra</button>
-            <button class="btn-main" onclick="openView('v-nuevo')">➕ Agregar Producto</button>
-            <button class="btn-main btn-danger" onclick="actualizarFaltantes()">⚠️ Qué Comprar</button>
+            <button class="btn-main" onclick="openView('v-venta')">
+                <span class="icon">💰</span> CARGAR VENTA
+            </button>
+            <button class="btn-main" onclick="actualizarFaltantes()">
+                <span class="icon">⚠️</span> QUÉ COMPRAR
+            </button>
+            <button class="btn-main" onclick="openView('v-nuevo')">
+                <span class="icon">➕</span> AGREGAR PRODUCTO
+            </button>
+            <button class="btn-main" onclick="openView('v-compra')">
+                <span class="icon">🛒</span> CARGAR COMPRA
+            </button>
         </div>
     </div>
 
-    <div id="v-venta" class="view">
-        <button class="btn-back" onclick="openView('home')">← Volver</button>
-        <h2>Cargar Venta</h2>
-        <input type="text" id="busqueda" placeholder="Buscar producto o promo..." onkeyup="buscarVenta()">
-        <select id="metodo-pago">
-            <option value="Efectivo">Efectivo</option>
-            <option value="Transferencia">Transferencia</option>
-        </select>
-        <div id="lista-ventas"></div>
-    </div>
-
     <div id="v-nuevo" class="view">
-        <button class="btn-back" onclick="openView('home')">← Volver</button>
-        <h2>Nuevo Producto Padre</h2>
-        <input type="text" id="n-nombre" placeholder="Nombre (Ej: Skyy Vodka)">
-        <input type="text" id="n-sabores" placeholder="Sabores (Ej: Frutos Rojos, Apricot)">
-        <input type="number" id="n-compra" placeholder="Precio Compra">
-        <input type="number" id="n-venta" placeholder="Precio Venta">
-        <input type="text" id="n-mezclador" placeholder="Mezclador (Opcional para promo)">
-        <button class="btn-save" onclick="guardarNuevo()">GUARDAR PRODUCTO</button>
+        <button class="btn-back" onclick="openView('home')">← VOLVER</button>
+        <h2>NUEVO PRODUCTO</h2>
+        <div class="form-group">
+            <input type="text" id="n-nombre" placeholder="Nombre (Ej: Skyy Vodka)">
+            <input type="text" id="n-sabores" placeholder="Sabores (Ej: Limon, Coco, Chicle)">
+            <input type="number" id="n-compra" placeholder="Precio Compra ($)">
+            <input type="number" id="n-venta" placeholder="Precio Venta Solo ($)">
+            <input type="text" id="n-mezclador" placeholder="Mezclador (Ej: Seven Up)">
+            <button class="btn-save" onclick="guardarNuevo()">GUARDAR EN STOCK</button>
+        </div>
     </div>
 
     <div id="v-comprar" class="view">
-        <button class="btn-back" onclick="openView('home')">← Volver</button>
-        <h2>Lista de Faltantes</h2>
-        <div id="lista-faltantes"></div>
+        <button class="btn-back" onclick="openView('home')">← VOLVER</button>
+        <h2>FALTANTES</h2>
+        <div id="lista-faltantes" class="list-container">
+            </div>
+    </div>
+
+    <div id="v-venta" class="view">
+        <button class="btn-back" onclick="openView('home')">← VOLVER</button>
+        <h2>REGISTRAR VENTA</h2>
+        <div class="form-group">
+            <select id="metodo-pago">
+                <option value="Efectivo">EFECTIVO</option>
+                <option value="Transferencia">TRANSFERENCIA</option>
+            </select>
+            <p style="color: #666; text-align: center; margin-top: 20px;">
+                El buscador de ventas se activará cuando cargues el stock.
+            </p>
+        </div>
     </div>
 
     <script src="script.js"></script>
 </body>
 </html>
+
