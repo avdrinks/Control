@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AV DRINKS | Sistema de Gestión</title>
+    <style>
+        :root { --blue: #00d4ff; --pink: #ff00ff; --bg: #0a0a0a; --card: #151515; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; }
+        
+        /* Navegación */
+        .header { padding: 20px; text-align: center; border-bottom: 1px solid var(--blue); }
+        .menu-principal { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
+        
+        .btn-menu {
+            background: var(--card); border: 2px solid var(--blue); color: white;
+            padding: 25px 10px; border-radius: 12px; font-weight: bold; cursor: pointer;
+            text-transform: uppercase; transition: 0.3s;
+        }
+        .btn-menu:active { transform: scale(0.95); box-shadow: 0 0 15px var(--blue); }
+
+        /* Vistas */
+        .vista { display: none; padding: 20px; }
+        .vista.activa { display: block; }
+
+        .btn-volver { background: none; border: 1px solid var(--pink); color: var(--pink); padding: 8px; margin-bottom: 20px; }
+        
+        input, select { width: 100%; padding: 12px; margin: 10px 0; background: #222; border: 1px solid #444; color: white; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1 style="color: var(--blue); text-shadow: 0 0 10px var(--blue);">AV DRINKS</h1>
+    </div>
+
+    <div id="menu" class="vista activa">
+        <div class="menu-principal">
+            <button class="btn-menu" onclick="mostrarVista('v-venta')">💰 Cargar Venta</button>
+            <button class="btn-menu" onclick="mostrarVista('v-stock')">📦 Stock Total</button>
+            <button class="btn-menu" onclick="mostrarVista('v-compra')">🛒 Agregar Compra</button>
+            <button class="btn-menu" onclick="mostrarVista('v-nuevo')">➕ Agregar Producto</button>
+            <button class="btn-menu" style="grid-column: span 2; border-color: var(--pink);" onclick="mostrarVista('v-faltantes')">⚠️ Qué Comprar</button>
+        </div>
+    </div>
+
+    <div id="v-venta" class="vista">
+        <button class="btn-volver" onclick="mostrarVista('menu')">← Volver</button>
+        <h2>Nueva Venta</h2>
+        <input type="text" placeholder="Buscar producto o promo...">
+        <select>
+            <option>Efectivo</option>
+            <option>Transferencia</option>
+        </select>
+        </div>
+
+    <div id="v-faltantes" class="vista">
+        <button class="btn-volver" onclick="mostrarVista('menu')">← Volver</button>
+        <h2 style="color: var(--pink);">Lista de Faltantes</h2>
+        <div id="lista-necesidad">
+            <p>Analizando stock...</p>
+        </div>
+    </div>
+
+    <script>
+        function mostrarVista(idVista) {
+            // Oculta todas las vistas
+            document.querySelectorAll('.vista').forEach(v => v.classList.remove('activa'));
+            // Muestra la seleccionada
+            document.getElementById(idVista).classList.add('activa');
+        }
+    </script>
+</body>
+</html>
