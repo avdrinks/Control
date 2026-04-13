@@ -3,37 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AV DRINKS</title>
+    <title>AV DRINKS APP</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="header"><h1>AV DRINKS</h1></div>
+
+    <div class="header">
+        <h1>AV DRINKS</h1>
+    </div>
 
     <div id="home" class="view active">
         <div class="menu-grid">
             <button class="btn-main" onclick="openView('v-venta')">💰 Cargar Venta</button>
+            <button class="btn-main" onclick="openView('v-stock')">📦 Stock Total</button>
             <button class="btn-main" onclick="openView('v-compra')">🛒 Agregar Compra</button>
             <button class="btn-main" onclick="openView('v-nuevo')">➕ Agregar Producto</button>
-            <button class="btn-main btn-danger" onclick="verQueComprar()">⚠️ Qué Comprar</button>
+            <button class="btn-main btn-danger" onclick="actualizarFaltantes()">⚠️ Qué Comprar</button>
         </div>
     </div>
 
-    <div id="v-nuevo" class="view" style="display:none;">
+    <div id="v-venta" class="view">
         <button class="btn-back" onclick="openView('home')">← Volver</button>
-        <h2>Nuevo Producto</h2>
-        <input type="text" id="n-padre" placeholder="Ej: Skyy Vodka">
-        <input type="text" id="n-sabor" placeholder="Ej: Limon, Coco, Chicle">
+        <h2>Cargar Venta</h2>
+        <input type="text" id="busqueda" placeholder="Buscar producto o promo..." onkeyup="buscarVenta()">
+        <select id="metodo-pago">
+            <option value="Efectivo">Efectivo</option>
+            <option value="Transferencia">Transferencia</option>
+        </select>
+        <div id="lista-ventas"></div>
+    </div>
+
+    <div id="v-nuevo" class="view">
+        <button class="btn-back" onclick="openView('home')">← Volver</button>
+        <h2>Nuevo Producto Padre</h2>
+        <input type="text" id="n-nombre" placeholder="Nombre (Ej: Skyy Vodka)">
+        <input type="text" id="n-sabores" placeholder="Sabores (Ej: Frutos Rojos, Apricot)">
         <input type="number" id="n-compra" placeholder="Precio Compra">
-        <input type="number" id="n-solo" placeholder="Precio Venta Solo">
-        <input type="number" id="n-promo" placeholder="Precio Venta Promo">
-        <input type="text" id="n-mezclador" placeholder="Ej: Seven Up">
+        <input type="number" id="n-venta" placeholder="Precio Venta">
+        <input type="text" id="n-mezclador" placeholder="Mezclador (Opcional para promo)">
         <button class="btn-save" onclick="guardarNuevo()">GUARDAR PRODUCTO</button>
     </div>
 
-    <div id="v-comprar" class="view" style="display:none;">
+    <div id="v-comprar" class="view">
         <button class="btn-back" onclick="openView('home')">← Volver</button>
-        <h2>Faltantes</h2>
-        <div id="lista-faltantes">Cargando...</div>
+        <h2>Lista de Faltantes</h2>
+        <div id="lista-faltantes"></div>
     </div>
 
     <script src="script.js"></script>
