@@ -1,0 +1,94 @@
+:root {
+    --blue: #00d4ff;
+    --pink: #ff00ff;
+    --green: #39ff14;
+    --bg: #050505;
+    --card: #121212;
+}
+
+body {
+    background-color: var(--bg);
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding-bottom: 50px;
+}
+
+.header {
+    text-align: center;
+    padding: 20px;
+    border-bottom: 2px solid var(--blue);
+    box-shadow: 0 0 15px var(--blue);
+}
+
+h1 { color: var(--blue); text-shadow: 0 0 10px var(--blue); margin: 0; }
+
+/* Menú Principal */
+.menu-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    padding: 20px;
+}
+
+.btn-main {
+    background: var(--card);
+    border: 2px solid var(--blue);
+    color: white;
+    padding: 25px 10px;
+    border-radius: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-main:active { transform: scale(0.95); box-shadow: 0 0 20px var(--blue); }
+
+.btn-danger { grid-column: span 2; border-color: var(--pink); color: var(--pink); }
+
+/* Vistas */
+.view { display: none; padding: 20px; }
+.view.active { display: block; }
+
+input, select {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    background: #1a1a1a;
+    border: 1px solid var(--blue);
+    color: white;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.btn-save {
+    background: var(--green);
+    color: black;
+    border: none;
+    padding: 15px;
+    width: 100%;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-back {
+    color: var(--pink);
+    background: none;
+    border: 1px solid var(--pink);
+    padding: 8px 15px;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+/* Buscador y Resultados */
+#lista-ventas { margin-top: 15px; }
+.item-busqueda {
+    background: #1a1a1a;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border-left: 4px solid var(--blue);
+    display: flex;
+    justify-content: space-between;
+}
