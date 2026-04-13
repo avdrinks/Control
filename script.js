@@ -1,36 +1,37 @@
+// CONFIGURACIÓN: Tu URL de Google Apps Script
 const URL_WEB_APP = "https://script.google.com/macros/s/AKfycbw5g1fL39NooFtXgkTAYVbnf3bxkYTB5o10I9APAbxq8Vrz1Zbnoe5u93aTQXssGy_8/exec";
 
-// 1. NAVEGACIÓN - Abre y cierra las pantallas
+// 1. NAVEGACIÓN: Hace que los botones cambien de pantalla
 function openView(viewId) {
     console.log("Cambiando a vista:", viewId);
-    // Ocultar todas las vistas (buscamos por la clase 'view')
+    // Escondemos todas las vistas
     document.querySelectorAll('.view').forEach(v => {
         v.classList.remove('active');
     });
-    // Mostrar la vista que pedimos por ID
+    // Mostramos la vista que corresponde
     const target = document.getElementById(viewId);
     if (target) {
         target.classList.add('active');
     } else {
-        console.error("No se encontró la vista:", viewId);
+        console.error("No se encontró la vista con ID:", viewId);
     }
 }
 
-// 2. GUARDAR PRODUCTO NUEVO (Soporta múltiples sabores)
+// 2. GUARDAR PRODUCTOS: Maneja el nombre y los múltiples sabores
 async function guardarNuevo() {
     const btn = event.target;
     const nombrePadre = document.getElementById('n-nombre').value;
     const saboresTexto = document.getElementById('n-sabores').value;
 
     if (!nombrePadre || !saboresTexto) {
-        alert("Por favor, completa el nombre y los sabores.");
+        alert("Completá el nombre y los sabores antes de guardar.");
         return;
     }
 
     btn.disabled = true;
     btn.innerText = "Guardando...";
 
-    // Dividimos los sabores por coma y quitamos espacios
+    // Separamos los sabores por coma
     const listaSabores = saboresTexto.split(',').map(s => s.trim());
 
     try {
@@ -53,27 +54,27 @@ async function guardarNuevo() {
                 body: JSON.stringify(data) 
             });
         }
-        alert("¡" + listaSabores.length + " variantes guardadas con éxito!");
-        location.reload(); 
+        alert("¡Productos cargados con éxito!");
+        location.reload(); // Recarga la página para limpiar campos
     } catch (e) {
-        alert("Error de conexión con el servidor.");
+        alert("Error de conexión");
         btn.disabled = false;
         btn.innerText = "GUARDAR PRODUCTO";
     }
 }
 
-// 3. ACTUALIZAR FALTANTES (Qué Comprar)
+// 3. ACTUALIZAR FALTANTES: Lee el stock del Excel
 async function actualizarFaltantes() {
     openView('v-comprar');
     const div = document.getElementById('lista-faltantes');
-    div.innerHTML = "<p style='color: #00d4ff;'>Analizando stock en el Excel...</p>";
+    div.innerHTML = "<p>Buscando en el Excel...</p>";
 
     try {
         const res = await fetch(URL_WEB_APP);
         const datos = await res.json();
         
         let faltantes = {};
-        // Empezamos en i=1 para saltar los encabezados del Sheets
+        // Empezamos en i=1 para saltar encabezados
         for (let i = 1; i < datos.length; i++) {
             let padre = datos[i][0];
             let sabor = datos[i][1];
@@ -86,28 +87,23 @@ async function actualizarFaltantes() {
         }
 
         if (Object.keys(faltantes).length === 0) {
-            div.innerHTML = "<p style='color: #39ff14;'>✅ Todo el stock está al día.</p>";
+            div.innerHTML = "<p style='color:#39ff14;'>✅ Todo en stock.</p>";
         } else {
             div.innerHTML = "";
             for (let p in faltantes) {
                 div.innerHTML += `
-                    <div style="border: 1px solid #ff00ff; padding: 12px; margin-bottom: 10px; border-radius: 8px; background: #1a1a1a;">
+                    <div style="border: 1px solid #ff00ff; padding: 10px; margin-bottom: 10px; border-radius: 8px;">
                         <strong style="color: #00d4ff;">${p}</strong><br>
-                        <small style="color: #eee;">Faltan: ${faltantes[p].join(", ")}</small>
+                        <small>${faltantes[p].join(", ")}</small>
                     </div>`;
             }
         }
     } catch (e) {
-        div.innerHTML = "<p style='color: red;'>Error al leer la base de datos.</p>";
+        div.innerHTML = "<p>Error al conectar con la base de datos.</p>";
     }
 }
 
-// 4. BUSCADOR DE VENTAS (Básico)
+// 4. BUSCADOR DE VENTAS (Mantenemos la función para que no tire error)
 function buscarVenta() {
-    const term = document.getElementById('busqueda').value.toLowerCase();
-    const lista = document.getElementById('lista-ventas');
-    lista.innerHTML = "";
-    if (term.length < 2) return;
-    console.log("Buscando producto:", term);
+    console.log("Buscando...");
 }
-.
