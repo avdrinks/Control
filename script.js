@@ -1,132 +1,119 @@
-const URL_GAS = "https://script.google.com/macros/s/AKfycbyi1Zzt7kqaBjxqRI7M9RRo0yyKUX-PJfivSoPpEuaBJfpja22nepLIT3W8CcDG8jhhzw/exec"; // Asegurate que termine en /exec
+const URL_GAS = "https://script.google.com/macros/s/AKfycbxPrH4AEuEGFblYCAEpvre7Gq1HK6DWqLe3KIGYLuzCHl5xINYSFRDOovlXhBU23qBpsA/exec";
+let db = { productos: [], sucursales: [], stock: [] };
+let seleccionado = null;
 
-let database = { productos: [], stock: [], sucursales: [] };
-let itemActivo = null;
-
-// CARGA INICIAL: Trae todo de una vez
-async function cargarApp() {
-    try {
-        const response = await fetch(URL_GAS);
-        const data = await response.json();
-        database.productos = data.productos;
-        database.stock = data.stock;
-        database.sucursales = data.sucursales;
-        
-        initSelects();
-        renderStock();
-    } catch (e) {
-        console.error("Error cargando base de datos", e);
-    }
+async function cargar() {
+    const res = await fetch(URL_GAS);
+    db = await res.json();
+    poblarSucs();
+    actualizarReposicion();
 }
 
-function showView(viewId) {
+function showView(id) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById(viewId).classList.add('active');
-    
-    // Marcar botón activo
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    event.currentTarget.classList.add('active');
+    document.getElementById(id).classList.add('active');
 }
 
-function initSelects() {
-    const sucs = database.sucursales.slice(1); // Saltar encabezado
-    const idsSelect = ['ven-sucursal', 'filtro-sucursal'];
-    
-    idsSelect.forEach(id => {
-        const el = document.getElementById(id);
-        if(!el) return;
-        el.innerHTML = id.includes('filtro') ? '<option value="TODAS">Todas las Sucursales</option>' : '';
-        sucs.forEach(s => {
-            el.innerHTML += `<option value="${s[0]}">${s[0]}</option>`;
-        });
-    });
-}
+function filtrar(modo) {
+    const q = document.getElementById(modo + '-buscar').value.toLowerCase();
+    const res = document.getElementById('res-' + modo);
+    res.innerHTML = "";
+    if (q.length < 2) return;
 
-// BUSCADOR EN TIEMPO REAL
-function filtrarVenta() {
-    const query = document.getElementById('ven-buscar').value.toLowerCase();
-    const resultados = document.getElementById('res-busqueda');
-    resultados.innerHTML = "";
-    
-    if (query.length < 2) return;
-
-    // Buscamos en la hoja PRODUCTOS (saltando el encabezado)
-    database.productos.slice(1).forEach(p => {
-        const nombreMatch = p[1].toLowerCase().includes(query);
-        const saborMatch = p[2].toLowerCase().includes(query);
-        
-        if (nombreMatch || saborMatch) {
+    db.productos.slice(1).forEach(p => {
+        if (p[1].toLowerCase().includes(q) || p[2].toLowerCase().includes(q)) {
             const div = document.createElement('div');
             div.className = "search-item";
-            div.innerHTML = `<strong>${p[1]}</strong> - <small>${p[2]}</small> <span>($${p[3]})</span>`;
-            div.onclick = () => seleccionarParaVenta(p);
-            resultados.appendChild(div);
+            div.innerHTML = `<strong>${p[1]}</strong> - ${p[2]} <small>(${p[6]})</small>`;
+            div.onclick = () => {
+                seleccionado = p;
+                document.getElementById('nom-' + modo).innerText = p[1] + " " + p[2];
+                document.getElementById('det-' + modo).style.display = "block";
+                res.innerHTML = "";
+            };
+            res.appendChild(div);
         }
     });
 }
 
-function seleccionarParaVenta(prod) {
-    itemActivo = prod;
-    document.getElementById('ven-prod-nom').innerText = `${prod[1]} ${prod[2]}`;
-    document.getElementById('ven-detalles').style.display = "block";
-    document.getElementById('res-busqueda').innerHTML = "";
+function agregarInputPromo() {
+    const container = document.getElementById('lista-promos');
+    const div = document.createElement('div');
+    div.className = "promo-input-group";
+    div.innerHTML = `
+        <input type="text" placeholder="Mezclador (Ej: Sprite)" class="p-mezcla">
+        <input type="number" placeholder="Cant (Ej: 2)" class="p-cant">
+        <input type="number" placeholder="Precio Promo $" class="p-pre">
+    `;
+    container.appendChild(div);
 }
 
-// ENVÍO DE DATOS
-async function ejecutarVenta() {
-    const sucursal = document.getElementById('ven-sucursal').value;
-    if(!sucursal) return alert("Seleccioná sucursal");
-
-    const btn = event.currentTarget;
-    btn.innerText = "Registrando...";
+async function registrar(tipo) {
+    const btn = event.target;
     btn.disabled = true;
+    btn.innerText = "Procesando...";
 
-    const venta = {
-        tipo: "VENTA",
-        idProd: itemActivo[0],
-        sucursal: sucursal,
-        cant: document.getElementById('ven-cant').value,
-        monto: itemActivo[3] * document.getElementById('ven-cant').value,
-        pago: document.getElementById('ven-pago').value
-    };
+    let data = { tipo: tipo };
 
-    await enviarDatos(venta);
-}
-
-async function enviarDatos(data) {
-    try {
-        await fetch(URL_GAS, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify(data)
-        });
-        alert("¡Operación Exitosa!");
-        location.reload();
-    } catch (e) {
-        alert("Error de conexión");
-        console.error(e);
+    if (tipo === 'NUEVO_PROD') {
+        data.padre = document.getElementById('p-padre').value;
+        data.sabor = document.getElementById('p-sabor').value;
+        data.precio = document.getElementById('p-precio').value;
+        data.stockIdeal = document.getElementById('p-ideal').value;
+        data.promos = Array.from(document.querySelectorAll('.promo-input-group')).map(div => ({
+            mezcla: div.querySelector('.p-mezcla').value,
+            cantidad: div.querySelector('.p-cant').value,
+            precio: div.querySelector('.p-pre').value
+        }));
+    } else if (tipo === 'VENTA') {
+        data.idProd = seleccionado[0];
+        data.idPadre = seleccionado[0].split('-')[0] + "-S"; // Identifica al padre para descontar stock
+        data.sucursal = document.getElementById('ven-sucursal').value;
+        data.cant = document.getElementById('cant-ven').value;
+        data.monto = seleccionado[4] > 0 ? seleccionado[4] * data.cant : seleccionado[3] * data.cant;
+        data.pago = document.getElementById('pago-ven').value;
+    } else if (tipo === 'COMPRA') {
+        data.idProd = seleccionado[0];
+        data.sucursal = document.getElementById('com-sucursal').value;
+        data.cant = document.getElementById('cant-com').value;
+        data.costo = document.getElementById('costo-com').value;
     }
+
+    await fetch(URL_GAS, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+    alert("¡Registro realizado!");
+    location.reload();
 }
 
-function renderStock() {
-    const filtro = document.getElementById('filtro-sucursal').value;
-    const tabla = document.getElementById('lista-stock');
-    tabla.innerHTML = "";
-
-    database.stock.slice(1).forEach(s => {
-        if (filtro === "TODAS" || s[1] === filtro) {
-            // Buscamos info del producto para mostrar nombre y sabor
-            const infoProd = database.productos.find(p => p[0] === s[0]) || ["?", "Prod. Eliminado", ""];
-            tabla.innerHTML += `
-                <tr>
-                    <td>${infoProd[1]}</td>
-                    <td>${infoProd[2]}</td>
-                    <td>${s[1]}</td>
-                    <td><b style="color:var(--accent)">${s[2]}</b></td>
-                </tr>`;
+function actualizarReposicion() {
+    const lista = document.getElementById('lista-reposicion');
+    lista.innerHTML = "";
+    db.productos.slice(1).forEach(p => {
+        if (p[6] === "SOLO") {
+            let totalStock = 0;
+            db.stock.forEach(s => { if(s[0] === p[0]) totalStock += Number(s[2]); });
+            if (totalStock < p[7]) {
+                lista.innerHTML += `<li>⚠️ ${p[1]} ${p[2]}: Faltan ${p[7] - totalStock} unid.</li>`;
+            }
         }
     });
 }
 
-// Iniciar al cargar
-window.onload = cargarApp;
+async function cerrarSemana() {
+    const res = await fetch(URL_GAS, { method: 'POST', body: JSON.stringify({tipo: 'CIERRE_SEMANA'}) });
+    const rep = await res.json();
+    document.getElementById('resumen-semanal').innerHTML = `
+        <p>Inversión: <b>$${rep.inversion}</b></p>
+        <p>Ventas: <b>$${rep.ventas}</b></p>
+        <hr>
+        <p>Ganancia: <b style="color:#00ff00">$${rep.ganancia}</b></p>
+    `;
+}
+
+function poblarSucs() {
+    ['ven-sucursal', 'com-sucursal'].forEach(id => {
+        const el = document.getElementById(id);
+        db.sucursales.slice(1).forEach(s => el.innerHTML += `<option value="${s[0]}">${s[0]}</option>`);
+    });
+}
+
+window.onload = cargar;
