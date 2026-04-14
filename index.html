@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AV DRINKS - Gestión PRO</title>
+    <title>AV DRINKS - Panel de Control</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
@@ -12,59 +12,72 @@
         <h2 class="brand">AV DRINKS</h2>
         <nav>
             <button onclick="showView('v-ventas')" class="nav-btn">💰 VENTAS</button>
-            <button onclick="showView('v-stock')" class="nav-btn">📦 STOCK REAL</button>
-            <button onclick="showView('v-productos')" class="nav-btn">➕ NUEVO PROD.</button>
             <button onclick="showView('v-compras')" class="nav-btn">🛒 COMPRAS</button>
-            <button onclick="showView('v-traslados')" class="nav-btn">🚚 TRASLADOS</button>
+            <button onclick="showView('v-productos')" class="nav-btn">➕ PRODUCTOS</button>
+            <button onclick="showView('v-stock')" class="nav-btn">📦 STOCK</button>
+            <button onclick="showView('v-reportes')" class="nav-btn">📓 CUADERNO</button>
         </nav>
     </div>
 
     <main class="content">
         <div id="v-ventas" class="view active">
-            <h1>Cargar Venta</h1>
-            <select id="ven-sucursal" class="main-select"><option value="">Seleccionar Sucursal...</option></select>
-            <input type="text" id="ven-buscar" placeholder="Escribí para buscar producto..." onkeyup="filtrarVenta()">
-            <div id="res-busqueda" class="search-results"></div>
+            <h1>Nueva Venta</h1>
+            <select id="ven-sucursal" class="main-select"></select>
+            <input type="text" id="ven-buscar" placeholder="Buscar producto o promo..." onkeyup="filtrar('ven')">
+            <div id="res-ven" class="search-results"></div>
             
-            <div id="ven-detalles" class="form-card" style="display:none;">
-                <h3 id="ven-prod-nom"></h3>
-                <div class="input-group">
-                    <label>Cantidad:</label>
-                    <input type="number" id="ven-cant" value="1">
-                </div>
-                <div class="input-group">
-                    <label>Pago:</label>
-                    <select id="ven-pago">
-                        <option value="Efectivo">Efectivo</option>
-                        <option value="Transferencia">Transferencia</option>
-                    </select>
-                </div>
-                <button class="btn-primary" onclick="ejecutarVenta()">CONFIRMAR VENTA</button>
+            <div id="det-ven" class="form-card" style="display:none;">
+                <h3 id="nom-ven"></h3>
+                <input type="number" id="cant-ven" value="1" placeholder="Cantidad">
+                <select id="pago-ven">
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Transferencia">Transferencia</option>
+                </select>
+                <button class="btn-primary" onclick="registrar('VENTA')">CONFIRMAR VENTA</button>
             </div>
         </div>
 
-        <div id="v-stock" class="view">
-            <h1>Stock General</h1>
-            <select id="filtro-sucursal" class="main-select" onchange="renderStock()"></select>
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr><th>Producto</th><th>Variante</th><th>Sucursal</th><th>Cant.</th></tr>
-                    </thead>
-                    <tbody id="lista-stock"></tbody>
-                </table>
+        <div id="v-compras" class="view">
+            <h1>Registrar Compra</h1>
+            <select id="com-sucursal" class="main-select"></select>
+            <input type="text" id="com-buscar" placeholder="¿Qué compraste?" onkeyup="filtrar('com')">
+            <div id="res-com" class="search-results"></div>
+            
+            <div id="det-com" class="form-card" style="display:none;">
+                <h3 id="nom-com"></h3>
+                <input type="number" id="cant-com" placeholder="Cantidad">
+                <input type="number" id="costo-com" placeholder="Costo Unitario ($)">
+                <button class="btn-primary" onclick="registrar('COMPRA')">SUMAR AL STOCK</button>
             </div>
         </div>
 
         <div id="v-productos" class="view">
-            <h1>Nuevo Maestro de Producto</h1>
+            <h1>Maestro de Productos</h1>
             <div class="form-card">
-                <input type="text" id="p-padre" placeholder="Producto (Ej: Smirnoff)">
-                <input type="text" id="p-sabor" placeholder="Sabor (Ej: Green Apple)">
+                <input type="text" id="p-padre" placeholder="Nombre (Ej: Campari)">
+                <input type="text" id="p-sabor" placeholder="Sabores (Ej: Clasico, Citric)">
                 <input type="number" id="p-precio" placeholder="Precio Venta Solo ($)">
-                <input type="number" id="p-promo" placeholder="Precio Promo ($)">
-                <input type="text" id="p-mezcla" placeholder="Mezclador">
-                <button class="btn-primary" onclick="crearProducto()">GUARDAR PRODUCTO</button>
+                <input type="number" id="p-ideal" placeholder="Stock Ideal (Reposición)">
+                <hr>
+                <h4>Configurar Promos para este producto:</h4>
+                <div id="lista-promos"></div>
+                <button class="btn-sec" onclick="agregarInputPromo()">+ Agregar Mezclador a la Promo</button>
+                <button class="btn-primary" style="margin-top:20px" onclick="registrar('NUEVO_PROD')">CREAR TODO</button>
+            </div>
+        </div>
+
+        <div id="v-reportes" class="view">
+            <h1>Finanzas y Reposición</h1>
+            <div class="report-grid">
+                <div class="card-info">
+                    <h3>Faltantes (Comprar)</h3>
+                    <ul id="lista-reposicion"></ul>
+                </div>
+                <div class="card-info">
+                    <h3>Resumen Semanal</h3>
+                    <div id="resumen-semanal">Pulse el botón para calcular</div>
+                    <button class="btn-primary" onclick="cerrarSemana()">CERRAR SEMANA</button>
+                </div>
             </div>
         </div>
     </main>
