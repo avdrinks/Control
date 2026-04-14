@@ -3,83 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AV DRINKS PRO</title>
+    <title>AV DRINKS - Gestión PRO</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="sidebar">
-        <h2>AV DRINKS</h2>
+        <h2 class="brand">AV DRINKS</h2>
         <nav>
-            <button onclick="showView('v-ventas')">💰 VENTAS</button>
-            <button onclick="showView('v-stock')">📦 STOCK REAL</button>
-            <button onclick="showView('v-productos')">➕ NUEVO PROD.</button>
-            <button onclick="showView('v-compras')">🛒 COMPRAS</button>
-            <button onclick="showView('v-traslados')">🚚 TRASLADOS</button>
+            <button onclick="showView('v-ventas')" class="nav-btn">💰 VENTAS</button>
+            <button onclick="showView('v-stock')" class="nav-btn">📦 STOCK REAL</button>
+            <button onclick="showView('v-productos')" class="nav-btn">➕ NUEVO PROD.</button>
+            <button onclick="showView('v-compras')" class="nav-btn">🛒 COMPRAS</button>
+            <button onclick="showView('v-traslados')" class="nav-btn">🚚 TRASLADOS</button>
         </nav>
     </div>
 
     <main class="content">
         <div id="v-ventas" class="view active">
             <h1>Cargar Venta</h1>
-            <select id="ven-sucursal"><option value="">Seleccionar Sucursal...</option></select>
-            <input type="text" id="ven-buscar" placeholder="Buscar producto..." onkeyup="filtrarVenta()">
+            <select id="ven-sucursal" class="main-select"><option value="">Seleccionar Sucursal...</option></select>
+            <input type="text" id="ven-buscar" placeholder="Escribí para buscar producto..." onkeyup="filtrarVenta()">
             <div id="res-busqueda" class="search-results"></div>
-            <div id="ven-detalles" style="display:none;">
-                <p id="ven-prod-nom"></p>
-                <input type="number" id="ven-cant" placeholder="Cantidad">
-                <select id="ven-pago">
-                    <option value="Efectivo">Efectivo</option>
-                    <option value="Transferencia">Transferencia</option>
-                </select>
-                <button class="btn-primary" onclick="ejecutarVenta()">REGISTRAR VENTA</button>
+            
+            <div id="ven-detalles" class="form-card" style="display:none;">
+                <h3 id="ven-prod-nom"></h3>
+                <div class="input-group">
+                    <label>Cantidad:</label>
+                    <input type="number" id="ven-cant" value="1">
+                </div>
+                <div class="input-group">
+                    <label>Pago:</label>
+                    <select id="ven-pago">
+                        <option value="Efectivo">Efectivo</option>
+                        <option value="Transferencia">Transferencia</option>
+                    </select>
+                </div>
+                <button class="btn-primary" onclick="ejecutarVenta()">CONFIRMAR VENTA</button>
             </div>
         </div>
 
         <div id="v-stock" class="view">
             <h1>Stock General</h1>
-            <select id="filtro-sucursal" onchange="renderStock()"></select>
+            <select id="filtro-sucursal" class="main-select" onchange="renderStock()"></select>
             <div class="table-wrapper">
                 <table>
-                    <thead><tr><th>Producto</th><th>Sabor</th><th>Sucursal</th><th>Cant.</th></tr></thead>
+                    <thead>
+                        <tr><th>Producto</th><th>Variante</th><th>Sucursal</th><th>Cant.</th></tr>
+                    </thead>
                     <tbody id="lista-stock"></tbody>
                 </table>
             </div>
         </div>
 
         <div id="v-productos" class="view">
-            <h1>Agregar Producto</h1>
-            <input type="text" id="p-padre" placeholder="Producto Padre (Ej: Skyy)">
-            <input type="text" id="p-sabor" placeholder="Sabor (Ej: Frutos Rojos)">
-            <input type="number" id="p-precio" placeholder="Precio Venta Solo">
-            <input type="number" id="p-promo" placeholder="Precio Promo (Opcional)">
-            <input type="text" id="p-mezcla" placeholder="Mezclador">
-            <button class="btn-primary" onclick="crearProducto()">GUARDAR PRODUCTO</button>
-        </div>
-
-        <div id="v-compras" class="view">
-            <h1>Ingreso de Mercadería</h1>
-            <select id="com-sucursal"></select>
-            <input type="text" id="com-buscar" placeholder="Buscar producto..." onkeyup="filtrarCompra()">
-            <div id="res-busqueda-com" class="search-results"></div>
-            <div id="com-detalles" style="display:none;">
-                <p id="com-prod-nom"></p>
-                <input type="number" id="com-cant" placeholder="Cantidad">
-                <input type="number" id="com-costo" placeholder="Costo Unitario">
-                <button class="btn-primary" onclick="ejecutarCompra()">CARGAR COMPRA</button>
-            </div>
-        </div>
-
-        <div id="v-traslados" class="view">
-            <h1>Mover Stock</h1>
-            <select id="tra-origen"><option>Sucursal Origen</option></select>
-            <select id="tra-destino"><option>Sucursal Destino</option></select>
-            <input type="text" id="tra-buscar" placeholder="Buscar producto..." onkeyup="filtrarTraslado()">
-            <div id="res-busqueda-tra" class="search-results"></div>
-            <div id="tra-detalles" style="display:none;">
-                <p id="tra-prod-nom"></p>
-                <input type="number" id="tra-cant" placeholder="Cantidad a mover">
-                <button class="btn-primary" onclick="ejecutarTraslado()">CONFIRMAR MOVIMIENTO</button>
+            <h1>Nuevo Maestro de Producto</h1>
+            <div class="form-card">
+                <input type="text" id="p-padre" placeholder="Producto (Ej: Smirnoff)">
+                <input type="text" id="p-sabor" placeholder="Sabor (Ej: Green Apple)">
+                <input type="number" id="p-precio" placeholder="Precio Venta Solo ($)">
+                <input type="number" id="p-promo" placeholder="Precio Promo ($)">
+                <input type="text" id="p-mezcla" placeholder="Mezclador">
+                <button class="btn-primary" onclick="crearProducto()">GUARDAR PRODUCTO</button>
             </div>
         </div>
     </main>
