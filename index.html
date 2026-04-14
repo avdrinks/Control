@@ -3,69 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AV DRINKS - Gestión</title>
+    <title>AV DRINKS PRO</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-
-    <div class="header">
-        <h1>AV DRINKS</h1>
-        <div class="neon-line"></div>
+    <div class="sidebar">
+        <h2>AV DRINKS</h2>
+        <nav>
+            <button onclick="showView('v-ventas')">💰 VENTAS</button>
+            <button onclick="showView('v-stock')">📦 STOCK REAL</button>
+            <button onclick="showView('v-productos')">➕ NUEVO PROD.</button>
+            <button onclick="showView('v-compras')">🛒 COMPRAS</button>
+            <button onclick="showView('v-traslados')">🚚 TRASLADOS</button>
+        </nav>
     </div>
 
-    <div id="home" class="view active">
-        <div class="menu-grid">
-            <button class="btn-main" onclick="openView('v-venta')">
-                <span class="icon">💰</span> CARGAR VENTA
-            </button>
-            <button class="btn-main" onclick="actualizarFaltantes()">
-                <span class="icon">⚠️</span> QUÉ COMPRAR
-            </button>
-            <button class="btn-main" onclick="openView('v-nuevo')">
-                <span class="icon">➕</span> AGREGAR PRODUCTO
-            </button>
-            <button class="btn-main" onclick="openView('v-compra')">
-                <span class="icon">🛒</span> CARGAR COMPRA
-            </button>
-        </div>
-    </div>
-
-    <div id="v-nuevo" class="view">
-        <button class="btn-back" onclick="openView('home')">← VOLVER</button>
-        <h2>NUEVO PRODUCTO</h2>
-        <div class="form-group">
-            <input type="text" id="n-nombre" placeholder="Nombre (Ej: Skyy Vodka)">
-            <input type="text" id="n-sabores" placeholder="Sabores (Ej: Limon, Coco, Chicle)">
-            <input type="number" id="n-compra" placeholder="Precio Compra ($)">
-            <input type="number" id="n-venta" placeholder="Precio Venta Solo ($)">
-            <input type="text" id="n-mezclador" placeholder="Mezclador (Ej: Seven Up)">
-            <button class="btn-save" onclick="guardarNuevo()">GUARDAR EN STOCK</button>
-        </div>
-    </div>
-
-    <div id="v-comprar" class="view">
-        <button class="btn-back" onclick="openView('home')">← VOLVER</button>
-        <h2>FALTANTES</h2>
-        <div id="lista-faltantes" class="list-container">
+    <main class="content">
+        <div id="v-ventas" class="view active">
+            <h1>Cargar Venta</h1>
+            <select id="ven-sucursal"><option value="">Seleccionar Sucursal...</option></select>
+            <input type="text" id="ven-buscar" placeholder="Buscar producto..." onkeyup="filtrarVenta()">
+            <div id="res-busqueda" class="search-results"></div>
+            <div id="ven-detalles" style="display:none;">
+                <p id="ven-prod-nom"></p>
+                <input type="number" id="ven-cant" placeholder="Cantidad">
+                <select id="ven-pago">
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Transferencia">Transferencia</option>
+                </select>
+                <button class="btn-primary" onclick="ejecutarVenta()">REGISTRAR VENTA</button>
             </div>
-    </div>
-
-    <div id="v-venta" class="view">
-        <button class="btn-back" onclick="openView('home')">← VOLVER</button>
-        <h2>REGISTRAR VENTA</h2>
-        <div class="form-group">
-            <select id="metodo-pago">
-                <option value="Efectivo">EFECTIVO</option>
-                <option value="Transferencia">TRANSFERENCIA</option>
-            </select>
-            <p style="color: #666; text-align: center; margin-top: 20px;">
-                El buscador de ventas se activará cuando cargues el stock.
-            </p>
         </div>
-    </div>
+
+        <div id="v-stock" class="view">
+            <h1>Stock General</h1>
+            <select id="filtro-sucursal" onchange="renderStock()"></select>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th>Producto</th><th>Sabor</th><th>Sucursal</th><th>Cant.</th></tr></thead>
+                    <tbody id="lista-stock"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="v-productos" class="view">
+            <h1>Agregar Producto</h1>
+            <input type="text" id="p-padre" placeholder="Producto Padre (Ej: Skyy)">
+            <input type="text" id="p-sabor" placeholder="Sabor (Ej: Frutos Rojos)">
+            <input type="number" id="p-precio" placeholder="Precio Venta Solo">
+            <input type="number" id="p-promo" placeholder="Precio Promo (Opcional)">
+            <input type="text" id="p-mezcla" placeholder="Mezclador">
+            <button class="btn-primary" onclick="crearProducto()">GUARDAR PRODUCTO</button>
+        </div>
+
+        <div id="v-compras" class="view">
+            <h1>Ingreso de Mercadería</h1>
+            <select id="com-sucursal"></select>
+            <input type="text" id="com-buscar" placeholder="Buscar producto..." onkeyup="filtrarCompra()">
+            <div id="res-busqueda-com" class="search-results"></div>
+            <div id="com-detalles" style="display:none;">
+                <p id="com-prod-nom"></p>
+                <input type="number" id="com-cant" placeholder="Cantidad">
+                <input type="number" id="com-costo" placeholder="Costo Unitario">
+                <button class="btn-primary" onclick="ejecutarCompra()">CARGAR COMPRA</button>
+            </div>
+        </div>
+
+        <div id="v-traslados" class="view">
+            <h1>Mover Stock</h1>
+            <select id="tra-origen"><option>Sucursal Origen</option></select>
+            <select id="tra-destino"><option>Sucursal Destino</option></select>
+            <input type="text" id="tra-buscar" placeholder="Buscar producto..." onkeyup="filtrarTraslado()">
+            <div id="res-busqueda-tra" class="search-results"></div>
+            <div id="tra-detalles" style="display:none;">
+                <p id="tra-prod-nom"></p>
+                <input type="number" id="tra-cant" placeholder="Cantidad a mover">
+                <button class="btn-primary" onclick="ejecutarTraslado()">CONFIRMAR MOVIMIENTO</button>
+            </div>
+        </div>
+    </main>
 
     <script src="script.js"></script>
 </body>
 </html>
-
